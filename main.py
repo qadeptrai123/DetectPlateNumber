@@ -18,7 +18,7 @@ from tensorflow.keras.layers import Dense, Dropout, Flatten, Input
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 
 # settings
-INPUT_WIDTH =  640
+INPUT_WIDTH = 640
 INPUT_HEIGHT = 640
 
 # LOAD THE IMAGE
@@ -30,7 +30,7 @@ fig.update_xaxes(showticklabels=False).update_yaxes(showticklabels=False)
 fig.show()
 
 # LOAD YOLO MODEL
-net = cv2.dnn.readNetFromONNX('./yolov5/runs/train/Model/weights/best.onnx')
+net = cv2.dnn.readNetFromONNX('./Model3/weights/best.onnx')
 net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
 net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
 
@@ -97,7 +97,7 @@ def drawings(image,boxes_np,confidences_np,index):
         conf_text = 'plate: {:.0f}%'.format(bb_conf*100)
 
         license_text = extract_text(image,boxes_np[ind])
-        print("Plate is:" + license_text)
+        #print("Plate is:" + license_text)
 
         cv2.rectangle(image,(x,y),(x+w,y+h),(255,0,255),2)
         cv2.rectangle(image,(x,y-30),(x+w,y),(255,0,255),-1)
