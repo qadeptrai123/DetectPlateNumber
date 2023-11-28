@@ -10,3 +10,4 @@ pip install plotly
 pip install matplotlib
 pip install scikit-image 
 Hello Quoc Anh dep trai
+Tui la Lam Huu Khanh
