@@ -9,4 +9,4 @@ pip install tensorflow
 pip install plotly
 pip install matplotlib
 pip install scikit-image 
-hell world
+Hello Quoc Anh dep trai
