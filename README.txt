@@ -11,3 +11,4 @@ pip install matplotlib
 pip install scikit-image 
 Hello Quoc Anh dep trai
 Tui la Lam Huu Khanh
+Tui La Dinh Xuan Khuong va dep trai hon Lam Huu Khanh 
