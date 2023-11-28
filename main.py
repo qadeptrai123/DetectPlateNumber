@@ -24,10 +24,10 @@ INPUT_HEIGHT = 640
 # LOAD THE IMAGE
 img = io.imread('TEST/TEST.jpeg')
 
-fig = px.imshow(img)
-fig.update_layout(width=700, height=400, margin=dict(l=10, r=10, b=10, t=10))
-fig.update_xaxes(showticklabels=False).update_yaxes(showticklabels=False)
-fig.show()
+#fig = px.imshow(img)
+#fig.update_layout(width=700, height=400, margin=dict(l=10, r=10, b=10, t=10))
+#fig.update_xaxes(showticklabels=False).update_yaxes(showticklabels=False)
+#fig.show()
 
 # LOAD YOLO MODEL
 net = cv2.dnn.readNetFromONNX('./Model3/weights/best.onnx')
@@ -117,6 +117,20 @@ def yolo_predictions(img,net):
     # step-3: Drawings
     result_img = drawings(img,boxes_np,confidences_np,index)
     return result_img
+
+# extrating text
+def extract_text(image,bbox):
+    x,y,w,h = bbox
+    roi = image[y:y+h, x:x+w]
+
+    if 0 in roi.shape:
+        return 'no number'
+
+    else:
+        text = pt.image_to_string(roi)
+        text = text.strip()
+
+        return text
 
 # test
 img = io.imread('TEST/TEST.jpeg')
