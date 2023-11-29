@@ -5,6 +5,7 @@ import pandas as pd
 import tensorflow as tf
 import pytesseract as pt
 import plotly.express as px
+import plotly.io as pio
 import matplotlib.pyplot as plt
 import xml.etree.ElementTree as xet
 import easyocr as eo
@@ -45,6 +46,8 @@ net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
 detector_params = {'name': 'craft', 'weights': 'craft_mlt_25k.pth'}
 recognizer_params = {'name': 'latin'}
 
+cropped_path = ""
+
 # Tạo đối tượng Reader
 reader = eo.Reader(
     lang_list=['en'],
@@ -52,17 +55,17 @@ reader = eo.Reader(
     recognizer=recognizer_params
 )
 
-
 # extrating text
 def extract_text(image,bbox):
     x,y,w,h = bbox
     roi = image[y:y+h, x:x+w]
+    io.imsave(cropped_path, roi)
     #fig = px.imshow(roi)
     #fig.show()
     text = reader.readtext(roi)
     res = ""
     for dect in text:
-        res = res + dect[1] + " "
+        res = res + dect[1]
     return res
     # text = pt.image_to_string(roi);
     # text.strip()
@@ -139,7 +142,7 @@ def drawings(image,boxes_np,confidences_np,index):
         conf_text = 'plate: {:.0f}%'.format(bb_conf*100)
 
         license_text = extract_text(image,boxes_np[ind])
-        print("Plate is:" + license_text)
+        #print("Plate is:" + license_text)
 
         cv2.rectangle(image,(x,y),(x+w,y+h),(255,0,255),2)
         cv2.rectangle(image,(x,y-30),(x+w,y),(255,0,255),-1)
@@ -161,10 +164,11 @@ def yolo_predictions(img,net):
     return result_img
 
 # test
-img = io.imread('TEST/TEST.jpeg')
-results = yolo_predictions(img,net)
+#img = io.imread('TEST/TEST.jpeg')
+#results = yolo_predictions(img,net)
+#io.imsave('./abc.jpeg', img)
 
-fig = px.imshow(img)
-fig.update_layout(width=700, height=400, margin=dict(l=10, r=10, b=10, t=10))
-fig.update_xaxes(showticklabels=False).update_yaxes(showticklabels=False)
-fig.show()   
+# fig = px.imshow(img)
+# fig.update_layout(width=700, height=400, margin=dict(l=10, r=10, b=10, t=10))
+# fig.update_xaxes(showticklabels=False).update_yaxes(showticklabels=False)
+# fig.show()   
