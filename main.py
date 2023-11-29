@@ -34,6 +34,22 @@ net = cv2.dnn.readNetFromONNX('./Model3/weights/best.onnx')
 net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
 net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
 
+# extrating text
+def extract_text(image,bbox):
+    x,y,w,h = bbox
+    roi = image[y:y+h, x:x+w]
+
+    if 0 in roi.shape:
+        return 'no number'
+
+    else:
+        text = pt.image_to_string(roi)
+        text = text.strip()
+
+        return text
+
+
+
 def get_detections(img,net):
     # 1.CONVERT IMAGE TO YOLO FORMAT
     image = img.copy()
@@ -117,20 +133,6 @@ def yolo_predictions(img,net):
     # step-3: Drawings
     result_img = drawings(img,boxes_np,confidences_np,index)
     return result_img
-
-# extrating text
-def extract_text(image,bbox):
-    x,y,w,h = bbox
-    roi = image[y:y+h, x:x+w]
-
-    if 0 in roi.shape:
-        return 'no number'
-
-    else:
-        text = pt.image_to_string(roi)
-        text = text.strip()
-
-        return text
 
 # test
 img = io.imread('TEST/TEST.jpeg')
