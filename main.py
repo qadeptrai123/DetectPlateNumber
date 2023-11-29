@@ -41,11 +41,9 @@ def extract_text(image,bbox):
 
     if 0 in roi.shape:
         return 'no number'
-
     else:
         text = pt.image_to_string(roi)
         text = text.strip()
-
         return text
 
 
@@ -113,7 +111,7 @@ def drawings(image,boxes_np,confidences_np,index):
         conf_text = 'plate: {:.0f}%'.format(bb_conf*100)
 
         license_text = extract_text(image,boxes_np[ind])
-        #print("Plate is:" + license_text)
+        print("Plate is:" + license_text)
 
         cv2.rectangle(image,(x,y),(x+w,y+h),(255,0,255),2)
         cv2.rectangle(image,(x,y-30),(x+w,y),(255,0,255),-1)
