@@ -139,17 +139,17 @@ def drawings(image,boxes_np,confidences_np,index):
     for ind in index:
         x,y,w,h =  boxes_np[ind]
         bb_conf = confidences_np[ind]
-        conf_text = 'plate: {:.0f}%'.format(bb_conf*100)
+        #conf_text = 'plate: {:.0f}%'.format(bb_conf*100)
 
         license_text = extract_text(image,boxes_np[ind])
         #print("Plate is:" + license_text)
 
-        cv2.rectangle(image,(x,y),(x+w,y+h),(255,0,255),2)
-        cv2.rectangle(image,(x,y-30),(x+w,y),(255,0,255),-1)
-        cv2.rectangle(image,(x,y+h),(x+w,y+h+25),(0,0,0),-1)
+        cv2.rectangle(image,(x,y),(x+w,y+h),(255,0,0),10)
+        #cv2.rectangle(image,(x,y-30),(x+w,y),(255,0,0),2)
+        #cv2.rectangle(image,(x,y+h),(x+w,y+h+25),(255,0,0),2)
 
-        cv2.putText(image,conf_text,(x,y-10),cv2.FONT_HERSHEY_SIMPLEX,0.7,(255,255,255),1)
-        cv2.putText(image,license_text,(x,y+h+27),cv2.FONT_HERSHEY_SIMPLEX,0.7,(0,255,0),1)
+        #cv2.putText(image,conf_text,(x,y-10),cv2.FONT_HERSHEY_SIMPLEX,0.7,(255,255,255),1)
+        #cv2.putText(image,license_text,(x,y+h+27),cv2.FONT_HERSHEY_SIMPLEX,0.7,(0,255,0),1)
 
     return image
 
