@@ -7,6 +7,7 @@ import pytesseract as pt
 import plotly.express as px
 import matplotlib.pyplot as plt
 import xml.etree.ElementTree as xet
+import easyocr as eo
 
 from glob import glob
 from skimage import io
@@ -17,6 +18,8 @@ from tensorflow.keras.applications import InceptionResNetV2
 from tensorflow.keras.layers import Dense, Dropout, Flatten, Input
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 
+
+#eo.download_and_install_model('craft', 'craft_mlt_25k.pth')
 # settings
 INPUT_WIDTH = 640
 INPUT_HEIGHT = 640
@@ -34,17 +37,42 @@ net = cv2.dnn.readNetFromONNX('./Model3/weights/best.onnx')
 net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
 net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
 
+
+# Chọn ngôn ngữ (ví dụ: tiếng Anh và tiếng Việt)
+#languages = ['en', 'vi']
+
+# Cấu hình tham số cho detector và recognizer
+detector_params = {'name': 'craft', 'weights': 'craft_mlt_25k.pth'}
+recognizer_params = {'name': 'latin'}
+
+# Tạo đối tượng Reader
+reader = eo.Reader(
+    lang_list=['en'],
+    detector=detector_params,
+    recognizer=recognizer_params
+)
+
+
 # extrating text
 def extract_text(image,bbox):
     x,y,w,h = bbox
     roi = image[y:y+h, x:x+w]
-
-    if 0 in roi.shape:
-        return 'no number'
-    else:
-        text = pt.image_to_string(roi)
-        text = text.strip()
-        return text
+    #fig = px.imshow(roi)
+    #fig.show()
+    text = reader.readtext(roi)
+    res = ""
+    for dect in text:
+        res = res + dect[1] + " "
+    return res
+    # text = pt.image_to_string(roi);
+    # text.strip()
+    # return text
+    # if 0 in roi.shape:
+    #    return 'no number'
+    # else:
+    #    text = pt.image_to_string(roi)
+    #    text = text.strip()
+    #    return text
 
 
 
