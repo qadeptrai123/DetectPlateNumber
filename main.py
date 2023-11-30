@@ -38,44 +38,66 @@ net = cv2.dnn.readNetFromONNX('./Model3/weights/best.onnx')
 net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
 net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
 
+pt.pytesseract.tesseract_cmd = r'C:\Users\beose\AppData\Local\Programs\Tesseract-OCR\tesseract.exe'
+myconfig = r'--oem 3 --psm 11'
+#myconfig += r' -l eng'
+#myconfig += r' --c tessedit_char_whitelist=0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+
+
+
 
 # Chọn ngôn ngữ (ví dụ: tiếng Anh và tiếng Việt)
 #languages = ['en', 'vi']
 
 # Cấu hình tham số cho detector và recognizer
-detector_params = {'name': 'craft', 'weights': 'craft_mlt_25k.pth'}
-recognizer_params = {'name': 'latin'}
+# detector_params = {'name': 'craft', 'weights': 'craft_mlt_25k.pth'}
+# recognizer_params = {'name': 'latin'}
 
 cropped_path = ""
 
-# Tạo đối tượng Reader
-reader = eo.Reader(
-    lang_list=['en'],
-    detector=detector_params,
-    recognizer=recognizer_params
-)
+# #Tạo đối tượng Reader
+# reader = eo.Reader(
+#     lang_list=['en', 'vi'],
+#     #detector=detector_params,
+#     #recognizer=recognizer_params
+# )
 
 # extrating text
 def extract_text(image,bbox):
     x,y,w,h = bbox
     roi = image[y:y+h, x:x+w]
     io.imsave(cropped_path, roi)
+    #res = pt.image_to_string(roi, config=myconfig)
     #fig = px.imshow(roi)
     #fig.show()
-    text = reader.readtext(roi)
-    res = ""
-    for dect in text:
-        res = res + dect[1]
-    return res
+    # text = reader.readtext(roi)
+    # res = ""
+    # for dect in text:
+    #     res = res + dect[1]
+    #return res
     # text = pt.image_to_string(roi);
     # text.strip()
     # return text
+    
+    #grayimage = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+        #io.imsave('./demo.jpeg', grayimage)
+        #plt.imshow(grayimage, cmap='gray')
+        #plt.show()
+    
+    #text = pt.image_to_string(grayimage, config=myconfig)
+    #text = text.strip()
+    #return text
+    return ""
     # if 0 in roi.shape:
     #    return 'no number'
     # else:
-    #    text = pt.image_to_string(roi)
-    #    text = text.strip()
-    #    return text
+    #     grayimage = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+    #     #io.imsave('./demo.jpeg', grayimage)
+    #     #plt.imshow(grayimage, cmap='gray')
+    #     #plt.show()
+    #     text = pt.image_to_string(grayimage, config=myconfig)
+    #     text = text.strip()
+    #     return text
 
 
 
@@ -142,7 +164,7 @@ def drawings(image,boxes_np,confidences_np,index):
         #conf_text = 'plate: {:.0f}%'.format(bb_conf*100)
 
         license_text = extract_text(image,boxes_np[ind])
-        #print("Plate is:" + license_text)
+        print("Plate is:" + license_text)
 
         cv2.rectangle(image,(x,y),(x+w,y+h),(255,0,0),10)
         #cv2.rectangle(image,(x,y-30),(x+w,y),(255,0,0),2)

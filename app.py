@@ -18,11 +18,15 @@ def index():
         img = main.io.imread('./static/upload/'+filename)
         results = main.yolo_predictions(img, main.net)
         main.io.imsave('./static/done/'+filename, img)
-        text = main.reader.readtext(main.cropped_path)
-        res = ""
-        for dect in text:
-            res = res + dect[1]
-        return render_template('index.html', upload=True, upload_image=filename, cropped_image=filename, text=res)
+        #trích xuất chữ
+        roi = main.io.imread(main.cropped_path)
+        grayimage = main.cv2.cvtColor(roi, main.cv2.COLOR_BGR2GRAY)
+        #grayimage = main.cv2.convertScaleAbs(grayimage, alpha=0.5, beta=0)
+        main.io.imsave('./ttt.jpeg', grayimage)
+        text = main.pt.image_to_string(grayimage, config=main.myconfig)
+        text = text.strip()
+    
+        return render_template('index.html', upload=True, upload_image=filename, cropped_image=filename, text=text)
 
     return render_template('index.html')
 
