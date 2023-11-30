@@ -66,6 +66,24 @@ cropped_path = ""
 def extract_text(image,bbox):
     x,y,w,h = bbox
     roi = image[y:y+h, x:x+w]
+    # roi = cv2.resize(roi, None, fx=2, fy=2)
+
+    # roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+    # roi = cv2.equalizeHist(roi)
+    # kernel = np.ones((1,1), np.uint8)
+    #  img = cv2.dilate(img, kernel, iterations=1)
+    #  img = cv2.erode(img, kernel, iterations=1)
+
+    #  img = cv2.threshold(cv2.medianBlur(img, 3), 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+
+    # cv2.imwrite('thresh.png', roi)
+
+    #pytesseract.pytesseract.tesseract_cmd = 'C:\\Program Files (x86)\\Tesseract-OCR\\tesseract.exe'
+        
+    # for psm in range(6,13+1):
+    #     config = '--oem 3 --psm %d' % psm
+    #     txt = pt.image_to_string(roi, config = config)
+    #     print('psm ', psm, ':',txt)
     io.imsave(cropped_path, roi)
     #res = pt.image_to_string(roi, config=myconfig)
     #fig = px.imshow(roi)
@@ -186,8 +204,8 @@ def yolo_predictions(img,net):
     return result_img
 
 # test
-#img = io.imread('TEST/TEST.jpeg')
-#results = yolo_predictions(img,net)
+# img = io.imread('TEST/TEST.jpeg')
+# results = yolo_predictions(img,net)
 #io.imsave('./abc.jpeg', img)
 
 # fig = px.imshow(img)
