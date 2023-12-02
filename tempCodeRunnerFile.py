@@ -1,4 +1,2 @@
-text = reader.readtext(roi)
-    # res = ""
-    # for dect in text:
-    #     res = res + dect[1]
+
+pt.pytesseract.tesseract_cmd = r'C:\Users\beose\AppData\Local\Programs\Tesseract-OCR\tesseract.exe'

@@ -9,6 +9,7 @@ import plotly.io as pio
 import matplotlib.pyplot as plt
 import xml.etree.ElementTree as xet
 import easyocr as eo
+import preprocess
 
 from glob import glob
 from skimage import io
@@ -66,6 +67,9 @@ cropped_path = ""
 def extract_text(image,bbox):
     x,y,w,h = bbox
     roi = image[y:y+h, x:x+w]
+    
+    #text2 = preprocess.preprocess(roi)
+    #print(text2)
     # roi = cv2.resize(roi, None, fx=2, fy=2)
 
     # roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
@@ -84,7 +88,9 @@ def extract_text(image,bbox):
     #     config = '--oem 3 --psm %d' % psm
     #     txt = pt.image_to_string(roi, config = config)
     #     print('psm ', psm, ':',txt)
+
     io.imsave(cropped_path, roi)
+    
     #res = pt.image_to_string(roi, config=myconfig)
     #fig = px.imshow(roi)
     #fig.show()
@@ -204,8 +210,8 @@ def yolo_predictions(img,net):
     return result_img
 
 # test
-# img = io.imread('TEST/TEST.jpeg')
-# results = yolo_predictions(img,net)
+#img = io.imread('TEST/TEST.jpeg')
+#results = yolo_predictions(img,net)
 #io.imsave('./abc.jpeg', img)
 
 # fig = px.imshow(img)

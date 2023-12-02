@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 import os
 import main
+import preprocess
 
 # Webserver gateway interface
 app = Flask (__name__)
@@ -19,9 +20,11 @@ def index():
         img = main.io.imread('./static/upload/'+filename)
         results = main.yolo_predictions(img, main.net)
         main.io.imsave('./static/done/'+filename, img)
-        #trích xuất chữ
         roi = main.io.imread(main.cropped_path)
-        grayimage = main.cv2.cvtColor(roi, main.cv2.COLOR_BGR2GRAY)
+        #trích xuất chữ
+        text2 = preprocess.preprocess(roi)
+        #grayimage = main.cv2.cvtColor(roi, main.cv2.COLOR_BGR2GRAY)
+        
         #grayimage = main.cv2.convertScaleAbs(grayimage, alpha=0.5, beta=0)
         #grayimage = main.cv2.GaussianBlur(grayimage, (5, 5), 0)
        # _, grayimage = main.cv2.threshold(grayimage, 128, 255, main.cv2.THRESH_BINARY)
@@ -33,16 +36,16 @@ def index():
         # new_h = int(600 * (600 / w))
         # new_w = int(600)
         # grayimage = main.cv2.resize(grayimage, (new_w, new_h))
-        main.io.imsave('./ttt.jpeg', grayimage)
-        text = main.pt.image_to_string(grayimage, config=main.myconfig)
-        text.strip()
+        # main.io.imsave('./ttt.jpeg', grayimage)
+        # text = main.pt.image_to_string(grayimage, config=main.myconfig)
+        text2.strip()
         # lines = text.splitlines()
         # res = ""
         # for line in lines:
         #     res = res + line
         # res = res.strip()
     
-        return render_template('index.html', upload=True, upload_image=filename, cropped_image=filename, text=text)
+        return render_template('index.html', upload=True, upload_image=filename, cropped_image=filename, text=text2)
 
     return render_template('index.html')
 
