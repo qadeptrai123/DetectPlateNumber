@@ -2,6 +2,9 @@ from flask import Flask, render_template, request
 import os
 import main
 import preprocess
+from paddleocr import PaddleOCR
+
+ocr = PaddleOCR()
 
 # Webserver gateway interface
 app = Flask (__name__)
@@ -22,7 +25,7 @@ def index():
         main.io.imsave('./static/done/'+filename, img)
         roi = main.io.imread(main.cropped_path)
         #trích xuất chữ
-        text2 = preprocess.preprocess(roi)
+        #text2 = preprocess.preprocess(roi)
         #grayimage = main.cv2.cvtColor(roi, main.cv2.COLOR_BGR2GRAY)
         
         #grayimage = main.cv2.convertScaleAbs(grayimage, alpha=0.5, beta=0)
@@ -38,14 +41,22 @@ def index():
         # grayimage = main.cv2.resize(grayimage, (new_w, new_h))
         # main.io.imsave('./ttt.jpeg', grayimage)
         # text = main.pt.image_to_string(grayimage, config=main.myconfig)
-        text2.strip()
+        #text2.strip()
         # lines = text.splitlines()
         # res = ""
         # for line in lines:
         #     res = res + line
         # res = res.strip()
-    
-        return render_template('index.html', upload=True, upload_image=filename, cropped_image=filename, text=text2)
+
+        #paddle OCR
+        text = ''
+        res = ocr.ocr(roi)
+        for line in res:
+            for word_info in line:
+                text += word_info[-1][0]
+
+
+        return render_template('index.html', upload=True, upload_image=filename, cropped_image=filename, text=text)
 
     return render_template('index.html')
 

@@ -14,11 +14,11 @@ import preprocess
 from glob import glob
 from skimage import io
 from shutil import copy
-from tensorflow.keras.models import Model
-from tensorflow.keras.callbacks import TensorBoard
-from tensorflow.keras.applications import InceptionResNetV2
-from tensorflow.keras.layers import Dense, Dropout, Flatten, Input
-from tensorflow.keras.preprocessing.image import load_img, img_to_array
+# from tensorflow.keras.models import Model
+# from tensorflow.keras.callbacks import TensorBoard
+# from tensorflow.keras.applications import InceptionResNetV2
+# from tensorflow.keras.layers import Dense, Dropout, Flatten, Input
+# from tensorflow.keras.preprocessing.image import load_img, img_to_array
 
 
 #eo.download_and_install_model('craft', 'craft_mlt_25k.pth')
