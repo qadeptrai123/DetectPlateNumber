@@ -1,2 +1,3 @@
-
-pt.pytesseract.tesseract_cmd = r'C:\Users\beose\AppData\Local\Programs\Tesseract-OCR\tesseract.exe'
+< 88:
+        c = int(88/height)
+        roi = cv2.resize(roi, None, fx = c, fy = c)

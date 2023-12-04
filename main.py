@@ -29,7 +29,7 @@ INPUT_WIDTH = 640
 INPUT_HEIGHT = 640
 
 # LOAD THE IMAGE
-img = io.imread('TEST/TEST.jpg')
+#img = io.imread('TEST/TEST.jpg')
 
 #fig = px.imshow(img)
 #fig.update_layout(width=700, height=400, margin=dict(l=10, r=10, b=10, t=10))
@@ -66,9 +66,9 @@ cropped_path = ""
 # )
 
 # extrating text
-def extract_text(image,bbox):
+def extract_text(image, bbox, ind):
     x,y,w,h = bbox
-    roi = image[y:y+h, x:x+w]
+    roi = image[y-10:y+h+10, x-10:x+w+10]
     
     #text2 = preprocess.preprocess(roi)
     #print(text2)
@@ -89,9 +89,7 @@ def extract_text(image,bbox):
     # for psm in range(6,13+1):
     #     config = '--oem 3 --psm %d' % psm
     #     txt = pt.image_to_string(roi, config = config)
-    #     print('psm ', psm, ':',txt)
-
-    io.imsave(cropped_path, roi)
+    #     print('psm ', psm, ':',txt)  
     
     #res = pt.image_to_string(roi, config=myconfig)
     #fig = px.imshow(roi)
@@ -113,11 +111,38 @@ def extract_text(image,bbox):
     #text = pt.image_to_string(grayimage, config=myconfig)
     #text = text.strip()
     #return text
+    height, width, _ = roi.shape
+    if height < 88:
+        c = 88/height
+        roi = cv2.resize(roi, None, fx = c, fy = c)
     res = ocr.ocr(roi)
+    
+    io.imsave('./static/cropped/' + str(ind) + '.jpeg', roi)
     if res is not None:
+        txt = ''
+        for line in res:
+            if line is not None:
+                for word_info in line:
+                    txt += word_info[-1][0]
+        if len(txt) < 3: 
+            return 0
         return 1
     else:
         return 0
+    # if res is not None:
+    #     txt = ''
+    #     for line in res:
+    #         if line is not None:
+    #             for word_info in line:
+    #                 txt += word_info[-1][0]
+    #     if txt == '': 
+    #         return 0
+    #     if len(txt) < 3:
+    #         return 0
+    #     io.imsave('./static/upload/' + str(ind) + '.jpeg', roi)
+    #     return 1
+    # else:
+    #     return 0
     # if 0 in roi.shape:
     #    return 'no number'
     # else:
@@ -131,17 +156,17 @@ def extract_text(image,bbox):
 
 
 
-def get_detections(img,net):
+def get_detections(img, net):
     # 1.CONVERT IMAGE TO YOLO FORMAT
     image = img.copy()
     row, col, d = image.shape
 
     max_rc = max(row,col)
-    input_image = np.zeros((max_rc,max_rc,3),dtype=np.uint8)
-    input_image[0:row,0:col] = image[:, :, :3]
+    input_image = np.zeros((max_rc,max_rc,3), dtype=np.uint8)
+    input_image[0:row, 0:col] = image[:, :, :3]
 
     # 2. GET PREDICTION FROM YOLO MODEL
-    blob = cv2.dnn.blobFromImage(input_image,1/255,(INPUT_WIDTH,INPUT_HEIGHT),swapRB=True,crop=False)
+    blob = cv2.dnn.blobFromImage(input_image, 1/255, (INPUT_WIDTH,INPUT_HEIGHT), swapRB=True, crop=False)
     net.setInput(blob)
     preds = net.forward()
     detections = preds[0]
@@ -191,12 +216,13 @@ def non_maximum_supression(input_image,detections):
 
 def drawings(image,boxes_np,confidences_np,index):
     # 5. Drawings
+    cnt = 0
     for ind in index:
         x,y,w,h =  boxes_np[ind]
         bb_conf = confidences_np[ind]
         #conf_text = 'plate: {:.0f}%'.format(bb_conf*100)
-
-        ok = extract_text(image,boxes_np[ind])
+        cnt += 1
+        ok = extract_text(image, boxes_np[ind], cnt)
         #print("Plate is:" + license_text)
         if ok > 0:
             cv2.rectangle(image,(x,y),(x+w,y+h),(255,0,0),10)
@@ -216,13 +242,13 @@ def yolo_predictions(img,net):
     boxes_np, confidences_np, index = non_maximum_supression(input_image, detections)
     # step-3: Drawings
     result_img = drawings(img,boxes_np,confidences_np,index)
-    return result_img
+    return result_img, len(index)
 
 # test
-#img = io.imread('TEST/TEST.jpg')
-#results = yolo_predictions(img,net)
-#io.imsave('./RESULT/abc.jpeg', img)
-
+img = io.imread('TEST/TEST.jpeg')
+results, cnt = yolo_predictions(img,net)
+io.imsave('./RESULT/abc.jpeg', img)
+#print(cnt)
 # fig = px.imshow(img)
 # fig.update_layout(width=700, height=400, margin=dict(l=10, r=10, b=10, t=10))
 # fig.update_xaxes(showticklabels=False).update_yaxes(showticklabels=False)

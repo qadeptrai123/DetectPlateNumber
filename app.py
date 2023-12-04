@@ -21,7 +21,7 @@ def index():
         upload_file.save(path_save)
         main.cropped_path = "./static/cropped/" + filename
         img = main.io.imread('./static/upload/'+filename)
-        results = main.yolo_predictions(img, main.net)
+        results, index = main.yolo_predictions(img, main.net)
         main.io.imsave('./static/done/'+filename, img)
         roi = main.io.imread(main.cropped_path)
         #trích xuất chữ
