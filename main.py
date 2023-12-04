@@ -14,6 +14,8 @@ import preprocess
 from glob import glob
 from skimage import io
 from shutil import copy
+from paddleocr import PaddleOCR
+ocr = PaddleOCR()
 # from tensorflow.keras.models import Model
 # from tensorflow.keras.callbacks import TensorBoard
 # from tensorflow.keras.applications import InceptionResNetV2
@@ -27,7 +29,7 @@ INPUT_WIDTH = 640
 INPUT_HEIGHT = 640
 
 # LOAD THE IMAGE
-img = io.imread('TEST/TEST.jpeg')
+img = io.imread('TEST/TEST.jpg')
 
 #fig = px.imshow(img)
 #fig.update_layout(width=700, height=400, margin=dict(l=10, r=10, b=10, t=10))
@@ -111,7 +113,11 @@ def extract_text(image,bbox):
     #text = pt.image_to_string(grayimage, config=myconfig)
     #text = text.strip()
     #return text
-    return ""
+    res = ocr.ocr(roi)
+    if res is not None:
+        return 1
+    else:
+        return 0
     # if 0 in roi.shape:
     #    return 'no number'
     # else:
@@ -132,14 +138,16 @@ def get_detections(img,net):
 
     max_rc = max(row,col)
     input_image = np.zeros((max_rc,max_rc,3),dtype=np.uint8)
-    input_image[0:row,0:col] = image
+    input_image[0:row,0:col] = image[:, :, :3]
 
     # 2. GET PREDICTION FROM YOLO MODEL
     blob = cv2.dnn.blobFromImage(input_image,1/255,(INPUT_WIDTH,INPUT_HEIGHT),swapRB=True,crop=False)
     net.setInput(blob)
     preds = net.forward()
     detections = preds[0]
-
+    # print(preds[0])
+    # print('\n')
+    #print(detections)
     return input_image, detections
 
 def non_maximum_supression(input_image,detections):
@@ -156,27 +164,28 @@ def non_maximum_supression(input_image,detections):
 
     for i in range(len(detections)):
         row = detections[i]
+        #print(row)
         confidence = row[4] # confidence of detecting license plate
-        if confidence > 0.4:
-            class_score = row[5] # probability score of license plate
-            if class_score > 0.25:
-                cx, cy , w, h = row[0:4]
+        # if confidence > 0.4:
+        #     class_score = row[5] # probability score of license plate
+        #     if class_score > 0.25:
+        cx, cy , w, h = row[0:4]
 
-                left = int((cx - 0.5*w)*x_factor)
-                top = int((cy-0.5*h)*y_factor)
-                width = int(w*x_factor)
-                height = int(h*y_factor)
-                box = np.array([left,top,width,height])
+        left = int((cx - 0.5*w)*x_factor)
+        top = int((cy-0.5*h)*y_factor)
+        width = int(w*x_factor)
+        height = int(h*y_factor)
+        box = np.array([left,top,width,height])
 
-                confidences.append(confidence)
-                boxes.append(box)
+        confidences.append(confidence)
+        boxes.append(box)
 
     # 4.1 CLEAN
     boxes_np = np.array(boxes).tolist()
     confidences_np = np.array(confidences).tolist()
 
     # 4.2 NMS
-    index = cv2.dnn.NMSBoxes(boxes_np,confidences_np,0.25,0.45)
+    index = cv2.dnn.NMSBoxes(boxes_np,confidences_np,0.0412,0.1)
 
     return boxes_np, confidences_np, index
 
@@ -187,15 +196,15 @@ def drawings(image,boxes_np,confidences_np,index):
         bb_conf = confidences_np[ind]
         #conf_text = 'plate: {:.0f}%'.format(bb_conf*100)
 
-        license_text = extract_text(image,boxes_np[ind])
-        print("Plate is:" + license_text)
+        ok = extract_text(image,boxes_np[ind])
+        #print("Plate is:" + license_text)
+        if ok > 0:
+            cv2.rectangle(image,(x,y),(x+w,y+h),(255,0,0),10)
+            #cv2.rectangle(image,(x,y-30),(x+w,y),(255,0,0),2)
+            #cv2.rectangle(image,(x,y+h),(x+w,y+h+25),(255,0,0),2)
 
-        cv2.rectangle(image,(x,y),(x+w,y+h),(255,0,0),10)
-        #cv2.rectangle(image,(x,y-30),(x+w,y),(255,0,0),2)
-        #cv2.rectangle(image,(x,y+h),(x+w,y+h+25),(255,0,0),2)
-
-        #cv2.putText(image,conf_text,(x,y-10),cv2.FONT_HERSHEY_SIMPLEX,0.7,(255,255,255),1)
-        #cv2.putText(image,license_text,(x,y+h+27),cv2.FONT_HERSHEY_SIMPLEX,0.7,(0,255,0),1)
+            #cv2.putText(image,conf_text,(x,y-10),cv2.FONT_HERSHEY_SIMPLEX,0.7,(255,255,255),1)
+            #cv2.putText(image,license_text,(x,y+h+27),cv2.FONT_HERSHEY_SIMPLEX,0.7,(0,255,0),1)
 
     return image
 
@@ -210,9 +219,9 @@ def yolo_predictions(img,net):
     return result_img
 
 # test
-#img = io.imread('TEST/TEST.jpeg')
+#img = io.imread('TEST/TEST.jpg')
 #results = yolo_predictions(img,net)
-#io.imsave('./abc.jpeg', img)
+#io.imsave('./RESULT/abc.jpeg', img)
 
 # fig = px.imshow(img)
 # fig.update_layout(width=700, height=400, margin=dict(l=10, r=10, b=10, t=10))

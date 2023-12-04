@@ -49,12 +49,20 @@ def index():
         # res = res.strip()
 
         #paddle OCR
+        height, width, _ = roi.shape
+        if height < 88:
+            c = int(88/height)
+            roi = main.cv2.resize(roi, None, fx = c, fy = c)
+        #print(roi.shape())
         text = ''
         res = ocr.ocr(roi)
+        #if res is not None:
         for line in res:
-            for word_info in line:
-                text += word_info[-1][0]
-
+            print(line)
+            # for word_info in line:
+            #     text += word_info[-1][0]
+        #else:
+        #    text = 'no text'
 
         return render_template('index.html', upload=True, upload_image=filename, cropped_image=filename, text=text)
 
