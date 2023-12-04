@@ -21,9 +21,8 @@ def index():
         upload_file.save(path_save)
         main.cropped_path = "./static/cropped/" + filename
         img = main.io.imread('./static/upload/'+filename)
-        results, index = main.yolo_predictions(img, main.net)
+        results, cnt = main.yolo_predictions(img, main.net)
         main.io.imsave('./static/done/'+filename, img)
-        roi = main.io.imread(main.cropped_path)
         #trích xuất chữ
         #text2 = preprocess.preprocess(roi)
         #grayimage = main.cv2.cvtColor(roi, main.cv2.COLOR_BGR2GRAY)
@@ -48,23 +47,30 @@ def index():
         #     res = res + line
         # res = res.strip()
 
-        #paddle OCR
-        height, width, _ = roi.shape
-        if height < 88:
-            c = int(88/height)
-            roi = main.cv2.resize(roi, None, fx = c, fy = c)
-        #print(roi.shape())
-        text = ''
-        res = ocr.ocr(roi)
-        #if res is not None:
-        for line in res:
-            print(line)
-            # for word_info in line:
-            #     text += word_info[-1][0]
-        #else:
-        #    text = 'no text'
+        #process each cropped image
+        plate_list = []
+        for index in range(cnt):
+            #lấy ảnh cropped
+            roi = main.io.imread('./static/cropped/' + str(index+1) + '.jpeg')
+            #paddle OCR
+            height, width, _ = roi.shape
+            if height < 88:
+                c = 88/height
+                roi = main.cv2.resize(roi, None, fx = c, fy = c)
+            #print(roi.shape())
+            text = ''
+            res = ocr.ocr(roi)
+            if res is not None:
+                for line in res:
+                    if line is not None:
+                        for word_info in line:
+                            if len(word_info[-1][0]) >= 3:
+                                text += word_info[-1][0]
+            #print(text + '\n')
+            plate_list.append(text)
+            
 
-        return render_template('index.html', upload=True, upload_image=filename, cropped_image=filename, text=text)
+        return render_template('index.html', upload=True, upload_image=filename, plate_list=plate_list)
 
     return render_template('index.html')
 

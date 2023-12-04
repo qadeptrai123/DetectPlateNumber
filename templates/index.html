@@ -34,17 +34,20 @@
   <br />
   <table style="border: solid black; width: 100%">
     <tr style="border: solid black">
-      <th>CROPPEED LICENCE PLATE IMAGE</th>
+      <th>CROPPED LICENCE PLATE IMAGE</th>
       <th>TEXT</th>
     </tr>
-    <tr style="border: solid black">
-      <td style="width: 50%">
-        <img style="display: block; margin: auto" class="img-fluid" src="/static/cropped/{{ cropped_image }}" alt="" />
-      </td>
-      <td style="background-color: #c1dce0; width: 50%">
-        <h1 style="display: block; margin: auto; text-align: center;" class="display-8">{{ text }}</h1>
-      </td>
-    </tr>
+    {% for index in range(plate_list|length) %}
+      {% set cropped_image = (index+1)|string + ".jpeg" %} 
+      <tr style="border: solid black">
+        <td style="width: 50%">
+          <img style="display: block; margin: auto" class="img-fluid" src="/static/cropped/{{ cropped_image }}" alt="" />
+        </td>
+        <td style="background-color: #c1dce0; width: 50%">
+          <h1 style="display: block; margin: auto; text-align: center;" class="display-8">{{ plate_list[index] }}</h1>
+        </td>
+      </tr>
+    {% endfor %}
   </table>
 </div>
 

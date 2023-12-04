@@ -245,9 +245,9 @@ def yolo_predictions(img,net):
     return result_img, len(index)
 
 # test
-img = io.imread('TEST/TEST.jpeg')
-results, cnt = yolo_predictions(img,net)
-io.imsave('./RESULT/abc.jpeg', img)
+#img = io.imread('TEST/TEST.jpeg')
+#results, cnt = yolo_predictions(img,net)
+#io.imsave('./RESULT/abc.jpeg', img)
 #print(cnt)
 # fig = px.imshow(img)
 # fig.update_layout(width=700, height=400, margin=dict(l=10, r=10, b=10, t=10))
