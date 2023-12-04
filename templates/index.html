@@ -10,7 +10,7 @@
   </form>
 </div>
 
-{% if upload %}
+{% if upload == 1 %}
 <div class="container">
   <br />
   <table>
@@ -38,7 +38,7 @@
       <th>TEXT</th>
     </tr>
     {% for index in range(plate_list|length) %}
-      {% set cropped_image = (index+1)|string + ".jpeg" %} 
+      {% set cropped_image = (index)|string + ".jpeg" %} 
       <tr style="border: solid black">
         <td style="width: 50%">
           <img style="display: block; margin: auto" class="img-fluid" src="/static/cropped/{{ cropped_image }}" alt="" />
@@ -51,4 +51,14 @@
   </table>
 </div>
 
-{% endif %} {% endblock %}
+{% endif %} 
+{% if upload == 2 %}
+  <video width="640" height="360" controls>
+    <source src="/static/done/output_video.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+
+{% endif %}
+
+{% endblock %}
