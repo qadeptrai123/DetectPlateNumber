@@ -217,8 +217,8 @@ def yolo_predictions(img,net, type_input):
     return result_img, cnt
 
 # test
-img = io.imread('TEST/TEST.jpeg')
-results, cnt = yolo_predictions(img, net, 0)
+#img = io.imread('TEST/TEST.jpeg')
+#results, cnt = yolo_predictions(img, net, 0)
 #io.imsave('./RESULT/abc.jpeg', img)
 #print(cnt)
 # fig = px.imshow(img)
@@ -239,7 +239,7 @@ def frame_to_jpeg(frame):
     return jpeg.tobytes()
 
 def video_process(cap):
-    #cap = cv2.VideoCapture('./TEST/TEST.mp4')
+    #cap = cv2.VideoCapture('./TEST/test.mp4')
     w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = cap.get(cv2.CAP_PROP_FPS)
@@ -265,3 +265,5 @@ def video_process(cap):
             
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             out.write(img)
+    cap.release()
+    out.release()

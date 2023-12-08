@@ -22,7 +22,7 @@ def index():
         a, b = filename.split('.')
         if b == 'mp4' or b == 'avi':
             cap = main.cv2.VideoCapture('./static/upload/' + filename)
-            #main.video_process(cap)
+            main.video_process(cap)
             return render_template('index.html', upload=2)
         
         main.cropped_path = "./static/cropped/" + filename
