@@ -2,12 +2,16 @@ from flask import Flask, render_template, request
 import os
 import main
 import preprocess
+import paddleocr
 from paddleocr import PaddleOCR
+import webview
 
-ocr = PaddleOCR()
+ocr = PaddleOCR(rec_model="./paddleocr/tools/infer/rec-model", det_model="./paddleocr/tools/infer/det-model")
+#ocr = PaddleOCR()
 
 # Webserver gateway interface
 app = Flask (__name__)
+window = webview.create_window('DetectLicensePlate', app)
 
 BASE_PATH = os.getcwd()
 UPLOAD_PATH = os.path.join(BASE_PATH, 'static/upload/')
@@ -62,4 +66,6 @@ def index():
     return render_template('index.html')
 
 if __name__ =="__main__":
-    app.run(debug=True)
+    #app.run(debug=True)
+    webview.start()
+

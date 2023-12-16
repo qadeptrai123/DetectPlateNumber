@@ -101,7 +101,7 @@ def get_text(image, bbox):
     roi = image[y-10:y+h+10, x-10:x+w+10]
     if not roi.size:
         #print(f"Empty ROI for index {ind}")
-        return 0
+        return ''
    
     roi = cv2.cvtColor(roi, cv2.COLOR_BGR2RGB)
     height, width, _ = roi.shape
@@ -158,26 +158,26 @@ def non_maximum_supression(input_image,detections, type_input):
         row = detections[i]
         #print(row)
         confidence = row[4] # confidence of detecting license plate
-        # if confidence > 0.4:
-        #     class_score = row[5] # probability score of license plate
-        #     if class_score > 0.25:
-        cx, cy , w, h = row[0:4]
+        if confidence > 0.4:
+            class_score = row[5] # probability score of license plate
+            if class_score > 0.25:
+                cx, cy , w, h = row[0:4]
+                
+                left = int((cx - 0.5*w)*x_factor)
+                top = int((cy-0.5*h)*y_factor)
+                width = int(w*x_factor)
+                height = int(h*y_factor)
+                box = np.array([left,top,width,height])
 
-        left = int((cx - 0.5*w)*x_factor)
-        top = int((cy-0.5*h)*y_factor)
-        width = int(w*x_factor)
-        height = int(h*y_factor)
-        box = np.array([left,top,width,height])
-
-        confidences.append(confidence)
-        boxes.append(box)
+                confidences.append(confidence)
+                boxes.append(box)
 
     # 4.1 CLEAN
     boxes_np = np.array(boxes).tolist()
     confidences_np = np.array(confidences).tolist()
 
     # 4.2 NMS
-    index = cv2.dnn.NMSBoxes(boxes_np,confidences_np,0.0412,0.1)
+    index = cv2.dnn.NMSBoxes(boxes_np,confidences_np,0.25,0.45)
     
         
     return boxes_np, confidences_np, index
@@ -193,23 +193,23 @@ def drawings(image, boxes_np, confidences_np, index, type_input):
         #conf_text = 'plate: {:.0f}%'.format(bb_conf*100)
         ok = extract_text(image, boxes_np[ind], cnt)
         #print("Plate is:" + license_text)
-        if ok > 0:
-            cnt += 1
-            cv2.rectangle(image,(x,y),(x+w,y+h),(255,0,0),5)
-            #cv2.rectangle(image,(x,y-30),(x+w,y),(255,0,0),2)
-            #cv2.rectangle(image,(x,y+h),(x+w,y+h+25),(255,0,0),2)
+        
+        cnt += 1
+        cv2.rectangle(image,(x,y),(x+w,y+h),(255,0,0),5)
+        #cv2.rectangle(image,(x,y-30),(x+w,y),(255,0,0),2)
+        #cv2.rectangle(image,(x,y+h),(x+w,y+h+25),(255,0,0),2)
 
-            #cv2.putText(image,conf_text,(x,y-10),cv2.FONT_HERSHEY_SIMPLEX,0.7,(255,255,255),1)
-            if type_input == 1:
-                license_text = get_text(image, boxes_np[ind])
-                cv2.putText(image, license_text, (x,y-30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255,0,0), 2)
+        #cv2.putText(image,conf_text,(x,y-10),cv2.FONT_HERSHEY_SIMPLEX,0.7,(255,255,255),1)
+        if type_input == 1:
+            license_text = get_text(image, boxes_np[ind])
+            cv2.putText(image, license_text, (x,y-30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255,0,0), 2)
 
     return image, cnt
 
 # predictions flow with return result
-def yolo_predictions(img,net, type_input):
+def yolo_predictions(img, net, type_input):
     # step-1: detections
-    input_image, detections = get_detections(img,net)
+    input_image, detections = get_detections(img, net)
     # step-2: NMS
     boxes_np, confidences_np, index = non_maximum_supression(input_image, detections, type_input)
     # step-3: Drawings
@@ -243,8 +243,8 @@ def video_process(cap):
     w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = cap.get(cv2.CAP_PROP_FPS)
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Có thể sử dụng 'mp4v' cho định dạng MP4
-    out = cv2.VideoWriter('./static/done/output_video.mp4', fourcc, fps, (w, h))
+    fourcc = cv2.VideoWriter_fourcc(*'H264')  # Có thể sử dụng 'mp4v' cho định dạng MP4
+    out = cv2.VideoWriter('./static/output_video.mp4', fourcc, int(fps), (w, h))
 
     #read frames
     ret = True
@@ -265,5 +265,5 @@ def video_process(cap):
             
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             out.write(img)
-    cap.release()
-    out.release()
+    # cap.release()
+    # out.release()
